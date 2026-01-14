@@ -8,4 +8,4 @@ test:
 
 .PHONY: build
 build:
-	goreleaser release --clean
+	SDK_PATH=$(xcrun --show-sdk-path) goreleaser release --clean
