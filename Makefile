@@ -8,4 +8,4 @@ test:
 
 .PHONY: build
 build:
-	goreleaser release --clean
+	goreleaser release --clean --snapshot

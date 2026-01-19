@@ -1,57 +1,58 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
-
-# The lines below are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/need to use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
-
 version: 2
-
-#before:
-#  hooks:
-    # You may remove this if you don't use go modules.
-    #- go mod tidy
-    # you may remove this if you don't need go generate
-    #- go generate ./...
-
+before:
+  hooks:
+    - go mod tidy
 env_files:
   github_token: ./token
-
 builds:
-  - main: ./cmd/pgn-tools/main.go
-    env:
-      - CGO_ENABLED=0
+  - main: ./cmd/cl-search/main.go
     goos:
       - linux
       - windows
-      - darwin
-
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+      - >-
+        {{- if eq .Os "linux" }}-buildmode=pie{{- end }}
+    env:
+      - CGO_ENABLED=1
+      - >-
+        {{- if eq .Os "linux" }}
+          {{- if eq .Arch "amd64" }}CC=zig cc -target x86_64-linux-musl -lc{{- end }}
+          {{- if eq .Arch "arm64"}}CC=zig cc -target aarch64-linux-musl -lc{{- end }}
+        {{- else if eq .Os "windows" }}
+          {{- if eq .Arch "amd64" }}CC=zig cc -target x86_64-windows-gnu -lc{{- end }}
+          {{- if eq .Arch "arm64"}}CC=zig cc -target aarch64-windows-gnu -lc{{- end }}
+        {{- end }}
+      - >-
+        {{- if eq .Os "linux" }}
+          {{- if eq .Arch "amd64" }}CXX=zig c++ -target x86_64-linux-musl -lc{{- end }}
+          {{- if eq .Arch "arm64"}}CXX=zig c++ -target aarch64-linux-musl -lc{{- end }}
+        {{- else if eq .Os "windows" }}
+          {{- if eq .Arch "amd64" }}CXX=zig c++ -target x86_64-windows-gnu -lc{{- end }}
+          {{- if eq .Arch "arm64"}}CXX=zig c++ -target aarch64-windows-gnu -lc{{- end }}
+        {{- end }}
 archives:
   - formats: [tar.gz]
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
+      {{ .ProjectName }}_ {{- title .Os }}_ {{- if eq .Arch "amd64" }}x86_64 {{- else if eq .Arch "386" }}i386 {{- else }}{{ .Arch }}{{ end }} {{- if .Arm }}v{{ .Arm }}{{ end }}
     # use zip for windows archives
     format_overrides:
       - goos: windows
         formats: [zip]
-
 changelog:
   sort: asc
   filters:
     exclude:
       - "^docs:"
       - "^test:"
-
 release:
   footer: >-
-
     ---
 
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
