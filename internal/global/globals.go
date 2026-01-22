@@ -10,7 +10,7 @@ import (
 	"github.com/gavink97/cl-search/internal/utils"
 )
 
-var VERSION = "2.0.0"
+var VERSION = "2.0.1"
 
 var CONFIG_HOME string = getConfigHome()
 var DATA_HOME string = getDataHome()
