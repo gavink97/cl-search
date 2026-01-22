@@ -150,8 +150,7 @@ func (job *Job) processResults(page playwright.Page) writer.GalleryResults {
 				global.Logger.Error("an error occurred scrolling result into view", slog.String("error", err.Error()))
 			}
 
-			// should probably change to waitFor LoadStateNetworkidle
-			time.Sleep(time.Duration(500) * time.Millisecond)
+			time.Sleep(time.Duration(250) * time.Millisecond)
 
 			viz, err = result.IsVisible()
 			if err != nil {
@@ -179,6 +178,26 @@ func (job *Job) processResults(page playwright.Page) writer.GalleryResults {
 
 			if err != nil {
 				global.Logger.Error("an error occurred clicking the result gallery", slog.String("error", err.Error()))
+			}
+		}
+
+		png := `//img[contains(@src, "data:image/png;base64")]`
+		pngs, err := result.Locator(png).Count()
+		if err != nil {
+			global.Logger.Warn("an error occurred getting pngs", slog.String("error", err.Error()))
+		}
+
+		for pngs > 0 {
+			time.Sleep(time.Duration(100) * time.Millisecond)
+
+			err = result.ScrollIntoViewIfNeeded()
+			if err != nil {
+				global.Logger.Error("an error occurred scrolling element into view", slog.String("error", err.Error()))
+			}
+
+			pngs, err = result.Locator(png).Count()
+			if err != nil {
+				global.Logger.Warn("an error occurred getting pngs", slog.String("error", err.Error()))
 			}
 		}
 
