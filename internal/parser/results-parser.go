@@ -44,28 +44,54 @@ func Parse(entry playwright.Locator) writer.GalleryResult {
 		}
 	}
 
-	meta, err := entry.Locator("div.meta").InnerHTML()
-	if err != nil {
-		global.Logger.Debug("An error occurred when getting meta", slog.String("error", err.Error()))
-	}
-
-	md := strings.Split(meta, `<span class="separator"></span>`)
+	meta := entry.Locator("div.meta")
 
 	var date string
-	var location string
-	// log info if no location
+	date, err = meta.Locator("span.result-posted-date").TextContent()
+	if err != nil {
+		global.Logger.Debug("An error occurred when getting date", slog.String("error", err.Error()))
+	}
 
-	switch len(md) {
-	case 1:
-		date = md[0]
-	case 2:
-		date = md[0]
-		location = md[1]
-	case 3:
-		date = md[0]
-		location = md[2]
-	default:
-		global.Logger.Debug("unknown meta length", slog.Int("length", len(md)), slog.String("meta", meta))
+	var location string
+	location, err = meta.Locator("span.result-location").TextContent()
+	if err != nil {
+		global.Logger.Debug("An error occurred when getting location", slog.String("error", err.Error()))
+		location = ""
+	}
+
+	var postDate *time.Time
+
+	if date == "" {
+		ml, err := meta.InnerHTML()
+		if err != nil {
+			global.Logger.Debug("An error occurred when getting meta", slog.String("error", err.Error()))
+		}
+
+		md := strings.Split(ml, `<span class="separator"></span>`)
+
+		switch len(md) {
+		case 1:
+			date = md[0]
+		case 2:
+			date = md[0]
+			if location == "" {
+				location = md[1]
+			}
+		case 3:
+			date = md[0]
+			if location == "" {
+				location = md[2]
+			}
+		default:
+			global.Logger.Debug("unknown meta length", slog.Int("length", len(md)), slog.String("meta", ml))
+		}
+	}
+
+	parsedTime, err := ParseDate(date)
+	if err != nil {
+		postDate = nil
+	} else {
+		postDate = &parsedTime
 	}
 
 	url, err := entry.Locator("a.main").GetAttribute("href")
@@ -150,6 +176,7 @@ func Parse(entry playwright.Locator) writer.GalleryResult {
 		Price:     price,
 		Location:  location,
 		Date:      date,
+		PostDate:  postDate,
 		Url:       url,
 		TimeStamp: time.Now().In(global.TZ),
 		Images:    images,

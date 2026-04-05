@@ -46,6 +46,9 @@ func (d *Database) CreateTables() error {
 
 	err = d.DB.AutoMigrate(
 		&Source{},
+		&Country{},
+		&Territory{},
+		&Local{},
 		&Item{},
 		&SourceItem{},
 		&ItemImage{},
@@ -55,9 +58,38 @@ func (d *Database) CreateTables() error {
 }
 
 func (d *Database) Insert(data GalleryResult) error {
-	source := Source{Source: data.Source}
+	source := Source{Name: "Craigslist", Url: "https://craigslist.org/"}
 
 	err := d.DB.Where(source).FirstOrCreate(&source).Error
+	if err != nil {
+		return err
+	}
+
+	country := Country{Country: data.Source.Country}
+
+	err = d.DB.Where(country).FirstOrCreate(&country).Error
+	if err != nil {
+		return err
+	}
+
+	territory := Territory{
+		Territory: data.Source.Territory,
+		CountryId: country.ID,
+	}
+
+	err = d.DB.Where(territory).FirstOrCreate(&territory).Error
+	if err != nil {
+		return err
+	}
+
+	local := Local{
+		Local:       data.Source.Local,
+		Url:         data.Source.Url,
+		TerritoryId: territory.ID,
+		CountryId:   country.ID,
+	}
+
+	err = d.DB.Where(local).FirstOrCreate(&local).Error
 	if err != nil {
 		return err
 	}
@@ -70,14 +102,15 @@ func (d *Database) Insert(data GalleryResult) error {
 	item := Item{
 		DataId:    id,
 		Title:     data.Title,
-		Date:      data.Date,
+		Date:      &data.Date,
+		PostDate:  data.PostDate,
 		Location:  &data.Location,
 		Price:     &data.Price,
 		TimeStamp: data.TimeStamp,
 		Url:       data.Url,
 	}
 
-	err = d.DB.Where(Item{DataId: id}).FirstOrCreate(&item).Error
+	err = d.DB.Where(Item{DataId: id}).Assign(&item).FirstOrCreate(&item).Error
 	if err != nil {
 		return err
 	}
@@ -85,6 +118,7 @@ func (d *Database) Insert(data GalleryResult) error {
 	sourceItem := SourceItem{
 		ItemId:   item.ID,
 		SourceId: source.ID,
+		LocalId:  local.ID,
 	}
 
 	err = d.DB.Where(sourceItem).FirstOrCreate(&sourceItem).Error
@@ -98,7 +132,7 @@ func (d *Database) Insert(data GalleryResult) error {
 			Url:    img,
 		}
 
-		err = d.DB.Where(image).FirstOrCreate(&image).Error
+		err = d.DB.Where(image).Assign(&image).FirstOrCreate(&image).Error
 		if err != nil {
 			global.Logger.Warn("could not insert image", slog.String("image", img), slog.String("error", err.Error()))
 			continue

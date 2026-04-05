@@ -1,6 +1,6 @@
 .PHONY: run
 run:
-	go run cmd/cl-search/main.go "us.tx" "record players" "output.csv"
+	go run cmd/cl-search/main.go "us.tx" "record players" "output.db"
 
 .PHONY: test
 test:

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -76,28 +77,30 @@ func main() {
 	}()
 
 	jobs := make(chan cl.Job, len(global.Location))
-	completed := make(chan cl.Job, len(global.Location))
+	results := make(chan cl.Job, len(global.Location))
 
 	for w := 1; w <= global.MaximumWorkers; w++ {
-		go worker(jobs, completed, browser)
+		go worker(jobs, results, browser)
 	}
 
-	for _, url := range global.Location {
+	for i, loc := range global.Location {
 		jobs <- cl.Job{
-			Url: url,
+			Loc:   loc,
+			Index: i,
 		}
 	}
+
 	close(jobs)
 
-	for range len(global.Location) {
-		job := <-completed
+	for range global.Location {
+		job := <-results
 		if job.Err != nil {
-			global.Logger.Warn("an error occurred while processing", slog.String("url", job.Url), slog.String("error", job.Err.Error()))
+			global.Logger.Warn("an error occurred while processing", slog.String("url", job.Loc.Url), slog.String("error", job.Err.Error()))
 			continue
 		}
 
 		result := job.Results
-		global.Logger.Info("completed gathering results", slog.String("url", job.Url), slog.Int("results", len(result)))
+		global.Logger.Info("completed gathering results", slog.String("url", job.Loc.Url), slog.Int("results", len(result)))
 
 		switch global.WriteAs {
 		case "csv":
@@ -113,18 +116,19 @@ func main() {
 			}
 		}
 	}
+
+	close(results)
 }
 
-// should print the number of jobs that will be completed
-func worker(jobs <-chan cl.Job, completed chan<- cl.Job, browser playwright.Browser) {
+func worker(jobs <-chan cl.Job, results chan<- cl.Job, browser playwright.Browser) {
 	for job := range jobs {
-		global.Logger.Info("starting to scrape", slog.String("url", job.Url))
+		global.Logger.Info(fmt.Sprintf("starting job %d of %d", job.Index+1, len(global.Location)), slog.String("url", job.Loc.Url))
 
 		err := cl.StartJob(browser, &job)
 		if err != nil {
 			job.Err = err
 		}
 
-		completed <- job
+		results <- job
 	}
 }

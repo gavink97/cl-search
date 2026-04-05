@@ -20,6 +20,12 @@ type Locality struct {
 	Url   string `json:"url"`
 }
 
+type Loc struct {
+	Country   string
+	Territory string
+	Locality
+}
+
 func SetDefaultLogger() {
 	options := &slog.HandlerOptions{
 		Level: ProgramLevel,

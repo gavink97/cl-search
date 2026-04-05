@@ -33,7 +33,7 @@ func (r *GalleryResult) ToCSV(output string) error {
 		}
 	}
 
-	table := []string{r.Id, r.Title, r.Date, r.Location, r.Price, r.TimeStamp.String(), r.Source, r.Url}
+	table := []string{r.Id, r.Title, r.Date, r.Location, r.Price, r.TimeStamp.String(), r.Source.Url, r.Url}
 
 	table = append(table, r.Images...)
 
@@ -73,7 +73,7 @@ func (res *GalleryResults) ResultsToCSV(output string) error {
 	}
 
 	for _, r := range *res {
-		table := []string{r.Id, r.Title, r.Date, r.Location, r.Price, r.TimeStamp.String(), r.Source, r.Url}
+		table := []string{r.Id, r.Title, r.Date, r.Location, r.Price, r.TimeStamp.String(), r.Source.Url, r.Url}
 
 		table = append(table, r.Images...)
 

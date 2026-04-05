@@ -3,6 +3,7 @@ package writer
 import (
 	"time"
 
+	"github.com/gavink97/cl-search/internal/global"
 	"gorm.io/gorm"
 )
 
@@ -12,9 +13,10 @@ type GalleryResult struct {
 	Price     string
 	Location  string
 	Date      string
+	PostDate  *time.Time
 	Url       string
 	TimeStamp time.Time
-	Source    string
+	Source    global.Loc
 	Images    []string
 }
 

@@ -201,9 +201,9 @@ func validLocation(str string) bool {
 	case 1:
 		country, ok := locs[str]
 		if ok {
-			for _, t := range country {
+			for a, t := range country {
 				for _, l := range t {
-					global.Location = append(global.Location, l.Url)
+					global.Location = append(global.Location, global.Loc{Country: str, Territory: a, Locality: l})
 				}
 			}
 			return true
@@ -217,7 +217,7 @@ func validLocation(str string) bool {
 			localities, ok := territories[territory]
 			if ok {
 				for _, locality := range localities {
-					global.Location = append(global.Location, locality.Url)
+					global.Location = append(global.Location, global.Loc{Country: country, Territory: territory, Locality: locality})
 				}
 				return true
 			}
@@ -234,7 +234,7 @@ func validLocation(str string) bool {
 			if ok {
 				local, ok := localities[locality]
 				if ok {
-					global.Location = append(global.Location, local.Url)
+					global.Location = append(global.Location, global.Loc{Country: country, Territory: territory, Locality: local})
 					return true
 				}
 			}
@@ -242,31 +242,31 @@ func validLocation(str string) bool {
 		return false
 	}
 
-	for _, countries := range locs {
+	for c, countries := range locs {
 		territory, ok := countries[str]
 		if ok {
-			for _, l := range territory {
-				global.Location = append(global.Location, l.Url)
+			for t, l := range territory {
+				global.Location = append(global.Location, global.Loc{Country: str, Territory: t, Locality: l})
 			}
 			return true
 		}
-		for _, territories := range countries {
+		for t, territories := range countries {
 			for l, locality := range territories {
 				local := locality.Local
 				subdomain := locality.Url[8 : len(locality.Url)-15]
 
 				if strings.Contains(l, str) {
-					global.Location = append(global.Location, locality.Url)
+					global.Location = append(global.Location, global.Loc{Country: c, Territory: t, Locality: locality})
 					return true
 				}
 
 				if strings.Contains(local, str) {
-					global.Location = append(global.Location, locality.Url)
+					global.Location = append(global.Location, global.Loc{Country: c, Territory: t, Locality: locality})
 					return true
 				}
 
 				if strings.Contains(subdomain, str) {
-					global.Location = append(global.Location, locality.Url)
+					global.Location = append(global.Location, global.Loc{Country: c, Territory: t, Locality: locality})
 					return true
 				}
 			}

@@ -10,7 +10,7 @@ import (
 	"github.com/gavink97/cl-search/internal/utils"
 )
 
-var VERSION = "2.0.1"
+var VERSION = "2.0.2"
 
 var CONFIG_HOME string = getConfigHome()
 var DATA_HOME string = getDataHome()
@@ -29,7 +29,7 @@ var DownloadImages bool = false
 var Headless bool = true
 var MaximumWorkers int = 4
 
-var Location []string
+var Location []Loc
 var Query string
 var NewCSV bool
 

@@ -15,7 +15,8 @@ import (
 )
 
 type Job struct {
-	Url     string
+	Index   int
+	Loc     global.Loc
 	Err     error
 	Results writer.GalleryResults
 }
@@ -64,7 +65,7 @@ func StartJob(browser playwright.Browser, job *Job) error {
 		}
 	}
 
-	url := fmt.Sprintf("%s/search/%s?query=%s", job.Url, category, b.String())
+	url := fmt.Sprintf("%s/search/%s?query=%s", job.Loc.Url, category, b.String())
 
 	_, err = page.Goto(url, playwright.PageGotoOptions{
 		WaitUntil: playwright.WaitUntilStateNetworkidle,
@@ -206,7 +207,7 @@ func (job *Job) processResults(page playwright.Page) writer.GalleryResults {
 			continue
 		}
 
-		r.Source = job.Url
+		r.Source = job.Loc
 		results = append(results, r)
 
 		count++
