@@ -2,13 +2,16 @@ package writer
 
 import (
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gavink97/cl-search/internal/global"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func open(dbName string) (*gorm.DB, error) {
@@ -17,7 +20,20 @@ func open(dbName string) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	return gorm.Open(sqlite.Open(dbName), &gorm.Config{})
+	gormLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true,
+			ParameterizedQueries:      true,
+			Colorful:                  false,
+		},
+	)
+
+	return gorm.Open(sqlite.Open(dbName), &gorm.Config{
+		Logger: gormLogger,
+	})
 }
 
 func MustOpen(dbName string) *Database {
@@ -89,7 +105,7 @@ func (d *Database) Insert(data GalleryResult) error {
 		CountryId:   country.ID,
 	}
 
-	err = d.DB.Where(local).FirstOrCreate(&local).Error
+	err = d.DB.Where(Local{Local: local.Local}).FirstOrCreate(&local).Error
 	if err != nil {
 		return err
 	}
@@ -100,6 +116,7 @@ func (d *Database) Insert(data GalleryResult) error {
 	}
 
 	item := Item{
+		SourceId:  source.ID,
 		DataId:    id,
 		Title:     data.Title,
 		Date:      &data.Date,
@@ -110,7 +127,7 @@ func (d *Database) Insert(data GalleryResult) error {
 		Url:       data.Url,
 	}
 
-	err = d.DB.Where(Item{DataId: id}).Assign(&item).FirstOrCreate(&item).Error
+	err = d.DB.Where("source_id = ? AND data_id = ?", source.ID, id).Assign(&item).FirstOrCreate(&item).Error
 	if err != nil {
 		return err
 	}

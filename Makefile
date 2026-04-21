@@ -1,6 +1,6 @@
 .PHONY: run
 run:
-	go run cmd/cl-search/main.go "us.tx" "record players" "output.db"
+	go run cmd/cl-search/main.go "us.tx" "record players" "output.db" --max-workers 10
 
 .PHONY: test
 test:

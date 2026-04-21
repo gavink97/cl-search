@@ -2,3 +2,4 @@
 token
 dist/
 go.sum
+*.db

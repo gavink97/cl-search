@@ -28,6 +28,7 @@ var Browser string = "chromium"
 var DownloadImages bool = false
 var Headless bool = true
 var MaximumWorkers int = 4
+var HighLatencyMode = false
 
 var Location []Loc
 var Query string

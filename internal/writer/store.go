@@ -22,8 +22,8 @@ type Territory struct {
 
 type Local struct {
 	ID          int       `gorm:"primaryKey;column:id"`
-	Local       string    `gorm:"column:local"`
-	Url         string    `gorm:"unique;column:url"`
+	Local       string    `gorm:"unique;column:local"`
+	Url         string    `gorm:"column:url"`
 	CountryId   int       `gorm:"column:country_id"`
 	TerritoryId int       `gorm:"column:territory_id"`
 	Country     Country   `gorm:"foreignKey:CountryId;references:ID"`
@@ -32,7 +32,8 @@ type Local struct {
 
 type Item struct {
 	ID        int        `gorm:"primaryKey;column:id"`
-	DataId    int        `gorm:"unique;column:data_id;size:255"`
+	SourceId  int        `gorm:"column:source_id"`
+	DataId    int        `gorm:"column:data_id;size:255"`
 	Title     string     `gorm:"column:title;size:500"`
 	Date      *string    `gorm:"column:date;size:255"`
 	PostDate  *time.Time `gorm:"column:post_date"`
@@ -40,6 +41,7 @@ type Item struct {
 	Price     *string    `gorm:"column:price;size:255"`
 	TimeStamp time.Time  `gorm:"column:timestamp"`
 	Url       string     `gorm:"column:url;size:500"`
+	Source    Source     `gorm:"foreignKey:SourceId;references:ID"`
 }
 
 type SourceItem struct {

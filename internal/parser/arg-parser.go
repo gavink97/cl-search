@@ -89,6 +89,11 @@ func ParseFlags(args []string) {
 			continue
 		}
 
+		if strings.EqualFold(arg, "--long-timeout") {
+			global.HighLatencyMode = true
+			continue
+		}
+
 		if strings.EqualFold(arg, "--max-workers") {
 			i++
 			workers, err := strconv.Atoi(args[i])

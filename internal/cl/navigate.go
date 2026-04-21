@@ -51,6 +51,10 @@ func StartJob(browser playwright.Browser, job *Job) error {
 		return fmt.Errorf("could not create page: %v", err)
 	}
 
+	if global.HighLatencyMode {
+		page.SetDefaultTimeout(180000)
+	}
+
 	query := global.Query
 	category := global.Category
 	qsplits := strings.Split(query, " ")
