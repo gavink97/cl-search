@@ -1,7 +1,7 @@
 = cl-search
 ifdef::env-github[]
 Gavin Kondrath <78187175+gavink97@users.noreply.github.com>
-v2.0.0, 2026-01-13
+v2.0.3, 2026-04-22
 :homepage: https://gav.ink
 endif::[]
 :toc:

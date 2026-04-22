@@ -10,7 +10,7 @@ import (
 	"github.com/gavink97/cl-search/internal/utils"
 )
 
-var VERSION = "2.0.2"
+var VERSION = "2.0.3"
 
 var CONFIG_HOME string = getConfigHome()
 var DATA_HOME string = getDataHome()
@@ -21,7 +21,8 @@ var ProgramLevel = &slog.LevelVar{}
 var Logger *slog.Logger
 var DBConnection *utils.Database
 
-var Output string = "output.csv"
+var DefaultOutput string = "output.csv"
+var Output string = DefaultOutput
 var WriteAs string = "csv"
 var Category string = "sss"
 var Browser string = "chromium"

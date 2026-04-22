@@ -14,18 +14,20 @@ The commands are:
 	version		print cl-search version
 
 Arguments available:
+
 	Location	required argument.
 	Query		required argument.
 
-	browser		sets the browser. default is chromium
-	max-workers	sets the maximum number of workers. default is 4
 	output		output path for results. default is "./output.csv"
 
 Flags available:
 
-	headed		enables headed mode for browser. default is false (headless)
-	images		enables downloading images. default is false
-	verbose		print debug messages
+	browser			sets the browser. default is chromium
+	headed			enables headed mode for browser. default is false (headless)
+	images			enables downloading images. default is false
+	long-timeout	sets the browser timeout to 180s
+	max-workers		sets the maximum number of workers. default is 4
+	verbose			print debug messages
 
 Use "cl-search help <command>" for more information about a command.
 

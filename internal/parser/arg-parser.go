@@ -124,6 +124,11 @@ func ParseFlags(args []string) {
 			continue
 		}
 
+		if global.Output != global.DefaultOutput {
+			fmt.Printf("unknown argument: %s\n", arg)
+			os.Exit(1)
+		}
+
 		if fs.ValidPath(arg) {
 			switch strings.ToLower(filepath.Ext(arg))[1:] {
 			case "csv":
