@@ -10,7 +10,8 @@ import (
 	"github.com/gavink97/cl-search/internal/utils"
 )
 
-var VERSION = "2.0.3"
+var VERSION = "2.0.4"
+var LOCATIONSVERSION = "1.0.0"
 
 var CONFIG_HOME string = getConfigHome()
 var DATA_HOME string = getDataHome()
@@ -30,6 +31,7 @@ var DownloadImages bool = false
 var Headless bool = true
 var MaximumWorkers int = 4
 var HighLatencyMode = false
+var NotifyUpdate = true
 
 var Location []Loc
 var Query string

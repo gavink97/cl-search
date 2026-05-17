@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/gavink97/cl-search/internal/global"
 	"github.com/gavink97/cl-search/internal/parser"
@@ -111,7 +112,14 @@ func (job *Job) processResults(page playwright.Page) writer.GalleryResults {
 		return nil
 	}
 
-	listingCount, err := strconv.Atoi(strings.TrimSpace(splts[1]))
+	total := strings.Map(func(r rune) rune {
+		if unicode.IsDigit(r) {
+			return r
+		}
+		return -1
+	}, splts[1])
+
+	listingCount, err := strconv.Atoi(total)
 	if err != nil {
 		global.Logger.Error("could not convert result count to integer", slog.String("error", err.Error()))
 		return nil

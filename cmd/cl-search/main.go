@@ -76,6 +76,7 @@ func main() {
 		}
 	}()
 
+	// move to using a sync.WaitGroup
 	jobs := make(chan cl.Job, len(global.Location))
 	results := make(chan cl.Job, len(global.Location))
 
